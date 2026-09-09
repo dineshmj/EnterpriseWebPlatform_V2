@@ -1,0 +1,18 @@
+.strip {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  background-color: #f3f4f6;
+  border-top: 1px solid #d1d5db;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: #374151;
+  white-space: nowrap;
+  overflow-x: auto;
+  z-index: 500;
+}

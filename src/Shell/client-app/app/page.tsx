@@ -40,9 +40,7 @@ function requestNavigationPermission(
 
         // Fail-open: if the currently-loaded page doesn't implement this
         // protocol (or nothing is loaded yet), don't block navigation forever.
-        // 30s comfortably outlasts a blocking window.confirm() dialog, which
-        // the earlier 300ms value did not — that caused navigation to proceed
-        // via this timeout before the user had even answered the prompt.
+        // 30s comfortably outlasts a blocking window.confirm() dialog.
         setTimeout(() => {
             if (!settled) {
                 window.removeEventListener('message', handleResponse);
@@ -59,23 +57,51 @@ function HomeContent() {
     const [menuData, setMenuData] = useState<MenuResponse | null>(null);
 
     // Tracks the ACTUAL origin of whatever is currently loaded in the iframe,
-    // as self-reported by the microfrontend on mount. We can't reliably derive
-    // this from `iframe.src` — that's the URL we *assigned* (often the BFF's
-    // silent-login endpoint), not necessarily where the frame ends up after
-    // any redirects (e.g. Orders' BFF and its Next.js dev server are on
-    // different origins). event.origin, by contrast, is set by the browser
-    // itself and can't be spoofed by the sender, so it's the source of truth.
+    // as self-reported by the microfrontend on mount (see rationale in the
+    // handler below — iframe.src alone isn't reliable for this).
     const currentFrameOriginRef = useRef<string | null>(null);
 
+    // Opaque cross-MFE context. The Shell never reads or interprets the
+    // contents of this object — it only stores whatever the currently-loaded
+    // MFE last posted, and hands it to the next MFE once it announces ready.
+    // This is intentionally the ONLY "business-adjacent" state the Shell
+    // carries, and it carries it mechanically, with no awareness of what a
+    // customerId or orderId means.
+    const currentContextRef = useRef<Record<string, unknown>>({});
+
     useEffect(() => {
-        function handleFrameReady(event: MessageEvent) {
+        function handleFrameMessage(event: MessageEvent) {
             const iframe = document.getElementById('microservice-frame') as HTMLIFrameElement | null;
-            if (!iframe || event.source !== iframe.contentWindow) return; // must genuinely be our iframe
-            if (event.data?.type !== 'PAS_MFE_READY') return;
-            currentFrameOriginRef.current = event.origin;
+            // Every message type below must genuinely originate from our iframe —
+            // this check (not an origin string) is what makes it safe to accept
+            // messages from whichever microfrontend happens to be loaded, since
+            // different MFEs live on different origins.
+            if (!iframe || event.source !== iframe.contentWindow) return;
+
+            if (event.data?.type === 'PAS_MFE_READY') {
+                currentFrameOriginRef.current = event.origin;
+                // Hand off whatever context we're currently holding to the MFE that
+                // just loaded. If nothing has been set yet, this sends `{}`.
+                (event.source as Window).postMessage(
+                    { type: 'PAS_CONTEXT_HANDOFF', context: currentContextRef.current },
+                    event.origin,
+                );
+                return;
+            }
+
+            if (event.data?.type === 'PAS_CONTEXT_UPDATE') {
+                // Full replace, no merge, no validation — deliberately mechanical.
+                currentContextRef.current = event.data.context ?? {};
+                // Diagnostic only — alert() is blocking, so every context update
+                // will interrupt the Shell UI. Fine for verifying this is working;
+                // swap for a non-blocking toast once you've confirmed the flow.
+                alert(`Shell received updated context:\n${JSON.stringify(currentContextRef.current, null, 2)}`);
+                return;
+            }
         }
-        window.addEventListener('message', handleFrameReady);
-        return () => window.removeEventListener('message', handleFrameReady);
+
+        window.addEventListener('message', handleFrameMessage);
+        return () => window.removeEventListener('message', handleFrameMessage);
     }, []);
 
     const handleMenuItemClick = async (item: MenuItem) => {
@@ -108,8 +134,10 @@ function HomeContent() {
         addVisitedMicroservice(item.baseURL);
 
         // Reset — the newly-loaded microfrontend will announce its own origin
-        // once it mounts. Clearing this now prevents a rapid second click from
-        // reusing the outgoing page's origin while the new one is still loading.
+        // once it mounts, and receive a fresh context handoff at that point.
+        // Note: currentContextRef is deliberately NOT reset here — context must
+        // survive across navigation regardless of whether the user chose to
+        // save their changes in the outgoing MFE.
         currentFrameOriginRef.current = null;
 
         const silentLoginUrl = `${item.baseURL}/api/auth/silent-login?returnUrl=${encodeURIComponent(item.urlRelativePath)}`;

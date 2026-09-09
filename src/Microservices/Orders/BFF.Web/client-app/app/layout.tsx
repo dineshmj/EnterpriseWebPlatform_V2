@@ -1,4 +1,5 @@
-import { NavigationGuardListener } from './components/NavigationGuardListener';
+import { ShellBridge } from './components/ShellBridge';
+import { ContextStatusStrip } from './components/ContextStatusStrip';
 
 export const metadata = {
   title: 'Next.js',
@@ -13,8 +14,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <NavigationGuardListener />
-        {children}
+        <ShellBridge />
+        {/* paddingBottom reserves space so page content never sits behind the fixed strip below */}
+        <div style={{ paddingBottom: '2.25rem' }}>
+          {children}
+        </div>
+        <ContextStatusStrip />
       </body>
     </html>
   )

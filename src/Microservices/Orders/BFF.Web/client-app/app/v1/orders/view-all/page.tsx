@@ -3,6 +3,7 @@
 import { HttpError, Order } from '@/app/types';
 import React, { useState, useEffect, useRef } from 'react';
 import appConfigData from '../../../../app.config.json';
+import { updateContext, getContext } from '../../../components/ShellBridge';
 
 //
 // Utility function for date formatting: dd-MMM-yyyy
@@ -55,6 +56,12 @@ const OrdersGetAllPage: React.FC = () => {
 
       if (Array.isArray(ordersData)) {
         setOrders(ordersData);
+
+        // Report the first record's ID back to the Shell, preserving
+        // whatever context (e.g. productId, categoryId) was already there.
+        if (ordersData.length > 0) {
+          updateContext({ ...getContext(), orderId: ordersData[0].orderId });
+        }
       } else {
         setError(new HttpError('Received unexpected data format from API.', 500));
       }
