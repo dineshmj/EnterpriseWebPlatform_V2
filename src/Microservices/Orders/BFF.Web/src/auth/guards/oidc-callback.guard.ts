@@ -5,9 +5,11 @@ import { AuthGuard } from '@nestjs/passport';
 export class OidcCallbackGuard extends AuthGuard('oidc') {
   handleRequest(err: any, user: any) {
     if (err || !user) {
-      // Covers a declined prompt=none attempt (error=login_required) and
-      // any other auth failure — treat all of these as "not authenticated"
-      // rather than letting the raw openid-client error become a 500.
+      // GOTCHA: a DECLINED prompt=none attempt (error=login_required from the IDP) throws
+      // here as a raw openid-client ClientError, not an HttpException. Without this guard
+      // converting it, Nest has no idea what to do with it and returns a bare 500 instead
+      // of a clean "not authenticated" response.
+      
       throw new UnauthorizedException('Authentication failed or was declined by the IDP.');
     }
     return user;

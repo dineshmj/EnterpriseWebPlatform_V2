@@ -37,6 +37,11 @@ async function bootstrap() {
   // Enable CORS for the NextJS frontend
   app.enableCors({
     origin: [process.env.NEXTJS_URL, process.env.SHELL_ORIGIN],
+      // GOTCHA: NEXTJS_URL alone was the original setting and looked sufficient for months —
+      // it only covers this BFF's own SPA. SHELL_ORIGIN is required separately because the
+      // Shell calls silent-logout on THIS BFF cross-origin; without it, that call either
+      // gets CORS-blocked outright or (for "simple" requests) reaches the server fine but
+      // the Shell's JS is blocked from ever reading the response.
     // If Shell URL is not specified here, it will cause CORS error when Shell attempts to perform silet-logout on behalf of the user, because the Shell is not same-origin with the BFF.
     credentials: true,
   });
@@ -68,9 +73,14 @@ async function bootstrap() {
   // Enforce CSRF protection on all state-changing requests from here on
   app.use((req: any, res: any, next: any) => {
     if (req.path === '/api/auth/silent-logout') {
-      return next(); // Logout is exempt: forcing a logout via CSRF is a nuisance-level
-                      // risk, not a data-integrity one, and doesn't warrant blocking it
-                      // until the full token-issuing endpoint exists for real mutations.
+      return next();
+        // GOTCHA: CSRF only checks non-GET/HEAD/OPTIONS methods by default —
+        // this route is a POST, so it WAS being silently 403'd here for
+        // months before anyone noticed, because the failure looked identical
+        // to "logout just didn't happen" rather than an explicit error.
+          // Logout is exempt: forcing a logout via CSRF is a nuisance-level
+          // risk, not a data-integrity one, and doesn't warrant blocking it
+          // until the full token-issuing endpoint exists for real mutations.
     }
     return csrfSynchronisedProtection(req, res, next);
   });

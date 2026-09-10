@@ -23,6 +23,11 @@ export class OidcStrategy extends PassportStrategy(Strategy, 'oidc') {
       scope: scopes,
       callbackURL: callbackUrl,
       passReqToCallback: false,
+        // GOTCHA: no authorizationRequestParams() override needed here — it's tempting to add
+        // one to forward `prompt`, but the base Strategy ALREADY auto-forwards prompt, scope,
+        // loginHint, idTokenHint, resource, and authorizationDetails from AuthenticateOptions.
+        // An override here would be redundant at best, and its exact signature (2 args, not 1)
+        // is easy to get wrong.
     });
   }
 
