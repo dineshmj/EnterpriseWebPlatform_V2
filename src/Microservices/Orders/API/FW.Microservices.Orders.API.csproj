@@ -12,10 +12,10 @@
     <!--<PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.5.5" />-->
     <PackageReference Include="HotChocolate.Data" Version="16.6.4" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="16.6.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.12" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="10.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.12" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="10.0.12" />
   </ItemGroup>
 
   <ItemGroup>
