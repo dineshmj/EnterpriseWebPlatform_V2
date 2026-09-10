@@ -7,7 +7,6 @@ import { AuthService } from '../auth.service';
 @Injectable()
 export class SilentAuthGuard extends AuthGuard('oidc') {
   constructor(private readonly authService: AuthService) {
-    // Call base AuthGuard constructor
     super();
   }
 
@@ -26,6 +25,14 @@ export class SilentAuthGuard extends AuthGuard('oidc') {
       return true;
     }
 
+    // NEW: Enforce that silent-login is only ever reached via the Shell
+    // embedding this URL in its iframe — never a direct browser navigation.
+    // Without this, a valid IDP SSO session would let ANY tab silently sign
+    // in just by hitting this URL directly, bypassing the Shell entirely.
+    if (req.headers['sec-fetch-dest'] !== 'iframe') {
+      return true; // skip OIDC; controller's fallback HTML will show instead
+    }
+
     // Store returnUrl in session for use after callback
     (req.session as any).returnUrl = returnUrl;
 
@@ -39,11 +46,8 @@ export class SilentAuthGuard extends AuthGuard('oidc') {
     const returnUrl = (req.query.returnUrl as string) ?? '/';
 
     return {
-      // These options get merged into the passport-openid-client strategy options
-      params: {
-        prompt: 'none', // Silent login
-      },
-      state: returnUrl, // Optional: keep returnUrl in OIDC state as well
+      prompt: 'none',
+      state: returnUrl,
     };
   }
 }

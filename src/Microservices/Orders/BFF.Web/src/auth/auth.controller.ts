@@ -7,11 +7,14 @@ import {
   Res,
   UseGuards,
   HttpStatus,
+  UseFilters,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { SilentAuthGuard } from './guards/silent-auth.guard';
+import { OidcCallbackGuard } from './guards/oidc-callback.guard';
+import { OidcAuthRequiredFilter } from './filters/oidc-auth-required.filter';
 
 @Controller('api/auth')
 export class AuthController {
@@ -80,7 +83,9 @@ export class AuthController {
    * redirect_uri: https://localhost:33800/api/auth/callback
    */
   @Get('callback')
-  @UseGuards(AuthGuard('oidc'))
+  @UseGuards(OidcCallbackGuard)
+  @UseFilters(OidcAuthRequiredFilter)
+  // @UseGuards(AuthGuard('oidc'))
   async oidcCallback(@Req() req: Request, @Res() res: Response) {
     // At this point, OIDC auth has succeeded and req.user is set for this request
     
