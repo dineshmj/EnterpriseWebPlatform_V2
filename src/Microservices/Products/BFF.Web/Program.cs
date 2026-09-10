@@ -225,9 +225,18 @@ builder.Services.AddHttpClient(MicroserviceApiResources.PRODUCTS_API, client =>
 
 builder.Services.AddCors(options =>
 {
+    // The application must support CORS with the host shell application, as the latter is going to initiate silent-logout and at that time CORS error should not rise.
     options.AddPolicy("AllowShell", policy =>
     {
-        policy.WithOrigins(builder.Configuration["ShellOrigin"])
+        var shellOriginUrl = builder.Configuration["ShellOrigin"];
+
+        // If appsettings.json does not have a URL specified for the "ShellOrigin" property, throw an error.
+        if (string.IsNullOrEmpty (shellOriginUrl))
+        {
+            throw new InvalidOperationException("Missing host shell application's URL for configuration key'ShellOrigin'.");
+        }
+
+        policy.WithOrigins(shellOriginUrl)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -246,7 +255,7 @@ app.UseSession();
     // 🡡__ IF NOT: HttpContext.Session will be unavailable and code relying on session storage will fail or behave unpredictably.
 
 app.UseHttpsRedirection();
-app.UseCors("AllowShell");
+app.UseCors("AllowShell");          // Against host shell application's URL.
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
