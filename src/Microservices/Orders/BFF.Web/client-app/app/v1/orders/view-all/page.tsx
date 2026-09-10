@@ -35,7 +35,8 @@ const OrdersGetAllPage: React.FC = () => {
     try {
       const res = await fetch(`${appConfigData.config.ordersBffUrl}/api/orders/view-all`, {
         method: 'GET',
-        credentials: 'include', // This ensures that the BFF auth cookie is sent back to the BFF server.
+        credentials: 'include', // This ensures that the BFF auth cookie is sent back to the BFF server.,
+        cache: 'no-store',      // This ensures that the BFF always fetches fresh data from the API, rather than serving potentially stale data from the browser cache.
       });
 
       if (!res.ok) {

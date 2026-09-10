@@ -7,9 +7,10 @@ import {
   Param,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { AuthService } from '../auth/auth.service';
 import { SessionAuthGuard } from '../auth/guards/session-auth.guard';
 import { Console } from 'console';
@@ -19,7 +20,9 @@ export class OrdersController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('view-all')
-  async getOrders(@Req() req: Request) {
+  async getOrders(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+      res.set('Cache-Control', 'no-store');
+      
       const accessToken = (req.session as any)?.AccessToken;
 
       console.log('Accessing getOrders with access token:', accessToken);

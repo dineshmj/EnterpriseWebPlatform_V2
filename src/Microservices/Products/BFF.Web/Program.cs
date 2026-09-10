@@ -220,8 +220,19 @@ builder.Services.AddHttpClient(MicroserviceApiResources.PRODUCTS_API, client =>
 {
 	client.BaseAddress = new Uri(ProductsMicroservice.MICROSERVICE_API_BASE_URL);
 }).AddUserAccessTokenHandler();
-    // 🡡__ WHY   : Automatically attaches the current user's access token to outgoing HttpClient requests so backend calls execute on behalf of the user.
-    // 🡡__ IF NOT: You would have to manually retrieve and attach access tokens for each request; missing tokens will cause API authorization failures.
+// 🡡__ WHY   : Automatically attaches the current user's access token to outgoing HttpClient requests so backend calls execute on behalf of the user.
+// 🡡__ IF NOT: You would have to manually retrieve and attach access tokens for each request; missing tokens will cause API authorization failures.
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowShell", policy =>
+    {
+        policy.WithOrigins(builder.Configuration["ShellOrigin"])
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
@@ -235,6 +246,7 @@ app.UseSession();
     // 🡡__ IF NOT: HttpContext.Session will be unavailable and code relying on session storage will fail or behave unpredictably.
 
 app.UseHttpsRedirection();
+app.UseCors("AllowShell");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 

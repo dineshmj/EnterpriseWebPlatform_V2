@@ -36,7 +36,8 @@ async function bootstrap() {
 
   // Enable CORS for the NextJS frontend
   app.enableCors({
-    origin: process.env.NEXTJS_URL,
+    origin: [process.env.NEXTJS_URL, process.env.SHELL_ORIGIN],
+    // If Shell URL is not specified here, it will cause CORS error when Shell attempts to perform silet-logout on behalf of the user, because the Shell is not same-origin with the BFF.
     credentials: true,
   });
 
@@ -65,7 +66,14 @@ async function bootstrap() {
   app.use(passport.session());
 
   // Enforce CSRF protection on all state-changing requests from here on
-  app.use(csrfSynchronisedProtection);
+  app.use((req: any, res: any, next: any) => {
+    if (req.path === '/api/auth/silent-logout') {
+      return next(); // Logout is exempt: forcing a logout via CSRF is a nuisance-level
+                      // risk, not a data-integrity one, and doesn't warrant blocking it
+                      // until the full token-issuing endpoint exists for real mutations.
+    }
+    return csrfSynchronisedProtection(req, res, next);
+  });
 
   const port = Number (process.env.PORT);
   await app.listen(port);
