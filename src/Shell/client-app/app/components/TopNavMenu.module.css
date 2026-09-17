@@ -1,111 +1,189 @@
 .navBar {
-  display: flex;
-  gap: 0.25rem;
-  padding: 0 2rem;
-  background-color: #f8f8f8;
-  border-bottom: 1px solid #ccc;
-  position: relative;
-  z-index: 20;
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+    min-height: 48px;
+    padding: 0 18px;
+    background: #fff;
+    border-bottom: 1px solid var(--shell-border);
+    box-shadow: 0 2px 7px rgba(16,42,67,.05);
+    position: relative;
+    z-index: 20;
 }
 
 .navItem {
-  position: relative;
+    position: relative;
 }
 
 .navButton {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.85rem 1.1rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-  color: #2563eb;
-  font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 48px;
+    padding: 0 15px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: #344054;
+    background: transparent;
+    cursor: pointer;
+    font-size: .82rem;
+    font-weight: 650;
+    font-family: inherit;
+    transition: color 150ms ease,background-color 150ms ease,border-color 150ms ease;
 }
 
-.navItem:hover .navButton {
-  background-color: #e0f2f1;
+    .navButton:hover, .navItem:hover .navButton {
+        color: var(--shell-blue);
+        background: #f7faff;
+        border-bottom-color: var(--shell-blue);
+    }
+
+.navIcon {
+    width: 25px;
+    height: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    color: var(--shell-blue);
+    background: var(--shell-blue-soft);
+    font-size: .67rem;
+    font-weight: 750;
 }
 
 .arrow {
-  font-size: 0.7rem;
-  transform: translateY(1px);
+    display: inline-flex;
+    transition: transform 150ms ease;
+    color: #98a2b3;
+    font-size: .68rem;
 }
 
-/* Level 1 -> 2: Management Areas for the hovered Microservice */
+.navItem:hover .arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown, .flyout {
+    overflow: visible;
+    background: #fff;
+    border: 1px solid #dce3eb;
+    box-shadow: 0 14px 30px rgba(16,42,67,.14);
+}
+
 .dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  min-width: 240px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 0 6px 6px 6px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-  padding: 0.4rem 0;
+    position: absolute;
+    top: calc(100% + 1px);
+    left: 0;
+    min-width: 245px;
+    padding: 6px;
+    border-radius: 0 10px 10px 10px;
+    animation: menuIn 120ms ease-out;
 }
 
 .areaRow {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.6rem 1rem;
-  cursor: default;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    min-height: 40px;
+    padding: 8px 10px 8px 12px;
+    border-radius: 7px;
+    cursor: default;
+    transition: background-color 130ms ease,color 130ms ease;
 }
 
-.areaRow:hover {
-  background-color: #f3f4f6;
-}
+    .areaRow:hover {
+        color: var(--shell-blue);
+        background: #f5f8fc;
+    }
 
 .areaLabel {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #4b5563;
+    font-size: .78rem;
+    font-weight: 600;
+    color: #475467;
+}
+
+.areaRow:hover .areaLabel {
+    color: #102a43;
 }
 
 .areaArrow {
-  font-size: 0.7rem;
-  color: #9ca3af;
+    color: #98a2b3;
+    font-size: .7rem;
 }
 
-/* Level 2 -> 3: leaf-node menu items, flown out after the hover delay */
+/* Third-level flyout */
 .flyout {
-  position: absolute;
-  top: -0.4rem;
-  left: 100%;
-  min-width: 220px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-  padding: 0.4rem 0;
+    position: absolute;
+    top: -7px;
+    left: 100%;
+    min-width: 235px;
+    padding: 6px;
+    border-radius: 9px;
+    animation: menuIn 120ms ease-out;
 }
+
+    /* Invisible hover bridge between the second-level item and flyout */
+    .flyout::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -8px;
+        width: 8px;
+        height: 100%;
+    }
 
 .flyoutList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .leafLink {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: #10b981;
-  text-decoration: none;
-  font-weight: 500;
-  white-space: nowrap;
+    display: flex;
+    align-items: center;
+    min-height: 39px;
+    padding: 8px 11px;
+    border-radius: 7px;
+    color: #344054;
+    text-decoration: none;
+    font-size: .78rem;
+    font-weight: 550;
+    white-space: nowrap;
+    transition: background-color 130ms ease,color 130ms ease,transform 130ms ease;
 }
 
-.leafLink:hover {
-  background-color: #ecfdf5;
-}
+    .leafLink:hover {
+        color: var(--shell-blue);
+        background: var(--shell-blue-soft);
+        transform: translateX(2px);
+    }
 
 .leafLinkDisabled {
-  color: #ccc;
-  cursor: not-allowed;
+    color: #98a2b3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+@keyframes menuIn {
+    from {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width:760px) {
+    .navBar {
+        padding: 0 8px;
+        overflow-x: auto;
+    }
+
+    .navButton {
+        padding: 0 11px;
+    }
 }

@@ -1,36 +1,25 @@
 'use client';
-
 import React from 'react';
+import styles from './CatalogGrid.module.css';
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  categoryName: string;
-  stockQuantity: number;
-}
+interface Product { id:number; name:string; price:number; categoryName:string; stockQuantity:number; }
+interface Props { products: Product[]; }
 
-interface ProductsGridProps {
-  products: Product[];
-}
+const stockState = (n:number) => n <= 0 ? 'out' : n <= 10 ? 'low' : 'healthy';
 
-const ProductsGrid: React.FC<ProductsGridProps> = ({ products }) => {
-  if (!products || products.length === 0) {
-    return <p>No items found.</p>;
-  }
-
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
-      {products.map((p) => (
-        <div key={p.id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{p.name}</h3>
-          <p style={{ margin: '0.25rem 0' }}><strong>Price:</strong> ${p.price.toFixed(2)}</p>
-          <p style={{ margin: '0.25rem 0' }}><strong>Category:</strong> {p.categoryName}</p>
-          <p style={{ margin: '0.25rem 0' }}><strong>Stock:</strong> {p.stockQuantity}</p>
-        </div>
-      ))}
-    </div>
-  );
+const ProductsGrid: React.FC<Props> = ({ products }) => {
+  if (!products?.length) return <div className={styles.empty}>No products found.</div>;
+  return <div className={styles.grid}>
+    {products.map(p => {
+      const state = stockState(p.stockQuantity);
+      return <article className={styles.card} key={p.id}>
+        <div className={styles.cardTop}><span className={styles.id}>#{p.id}</span><span className={`${styles.stock} ${styles[state]}`}>{state === 'healthy' ? 'In stock' : state === 'low' ? 'Low stock' : 'Out of stock'}</span></div>
+        <h3>{p.name}</h3>
+        <div className={styles.price}>$ {p.price.toFixed(2)}</div>
+        <div className={styles.meta}><span>Category</span><strong>{p.categoryName}</strong></div>
+        <div className={styles.meta}><span>Available units</span><strong>{p.stockQuantity}</strong></div>
+      </article>;
+    })}
+  </div>;
 };
-
 export default ProductsGrid;

@@ -1,0 +1,27 @@
+.profileArea { position: relative; display: flex; align-items: center; gap: 8px; }
+.profileButton, .notificationButton { border: 1px solid transparent; color: #fff; background: transparent; cursor: pointer; }
+.profileButton { display: flex; align-items: center; gap: 10px; min-width: 188px; padding: 6px 9px 6px 6px; border-radius: 10px; text-align: left; transition: background-color 160ms ease, border-color 160ms ease; }
+.profileButton:hover, .profileButton[aria-expanded="true"] { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.12); }
+.avatar, .menuAvatar { position: relative; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; border-radius: 50%; color: #174a70; background: #dcecff; border: 2px solid rgba(255,255,255,.8); }
+.avatar { width: 38px; height: 38px; }
+.avatarStatus { position: absolute; right: -1px; bottom: 0; width: 9px; height: 9px; border: 2px solid var(--shell-navy-900); border-radius: 50%; background: #12b76a; }
+.identity { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.name { max-width: 125px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .83rem; font-weight: 650; }
+.role { color: rgba(255,255,255,.62); font-size: .68rem; }
+.profileChevron { margin-left: auto; opacity: .7; }
+.notificationButton { position: relative; width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; transition: background-color 160ms ease; }
+.notificationButton:hover { background: rgba(255,255,255,.09); }
+.notificationDot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border: 2px solid var(--shell-navy-900); border-radius: 50%; background: var(--shell-danger); }
+.menu { position: absolute; top: calc(100% + 10px); right: 0; width: 278px; padding: 8px; z-index: 100; border: 1px solid #dce3eb; border-radius: 12px; background: #fff; box-shadow: 0 16px 40px rgba(16,42,67,.18); color: #172b4d; }
+.menuHeader { display: flex; align-items: center; gap: 10px; padding: 9px; }
+.menuAvatar { width: 38px; height: 38px; border: 0; }
+.menuHeader strong, .menuHeader small { display: block; }
+.menuHeader strong { font-size: .82rem; }
+.menuHeader small { max-width: 185px; margin-top: 2px; overflow: hidden; color: #667085; font-size: .7rem; text-overflow: ellipsis; white-space: nowrap; }
+.menuDivider { height: 1px; margin: 6px 2px; background: #edf0f4; }
+.menuItem, .logoutItem { width: 100%; display: flex; align-items: center; gap: 11px; min-height: 38px; padding: 8px 10px; border: 0; border-radius: 8px; color: #344054; background: transparent; text-decoration: none; cursor: pointer; font-size: .79rem; text-align: left; }
+.menuItem:hover { background: #f5f8fc; color: #102a43; }
+.logoutItem { color: #b42318; }
+.logoutItem:hover { background: #fff4f2; }
+.unreadBadge { min-width: 19px; height: 19px; margin-left: auto; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; color: #fff; background: var(--shell-danger); font-size: .65rem; font-weight: 700; }
+@media (max-width:650px) { .identity, .profileChevron { display:none; } .profileButton { min-width:auto; } .menu { right:-5px; } }
