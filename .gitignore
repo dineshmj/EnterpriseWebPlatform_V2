@@ -18,6 +18,7 @@
 /src/Microservices/Products.WebUI/bin/Debug/net8.0
 /src/Microservices/Products.WebUI/obj
 /src/IDP/bin/Debug/net8.0
+/src/IDP/keys
 /src/IDP/obj
 /src/Microservices/Orders/API/bin/Debug/net8.0
 /src/Microservices/Orders/API/obj
